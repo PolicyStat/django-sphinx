@@ -318,8 +318,12 @@ class SphinxQuerySet(object):
             if hasattr(v, '__iter__'):
                 v = list(v)
             elif not (isinstance(v, list) or isinstance(v, tuple)):
-                 v = [v,]
-            filters.setdefault(k, []).extend(map(to_sphinx, v))
+                v = [v,]
+            current_filter = set(filters.get(k, []))
+            new_filter = set(map(to_sphinx, v))
+            if current_filter:
+                new_filter = new_filter & current_filter
+            filters[k] = list(new_filter)
         return self._clone(_filters=filters)
 
     def geoanchor(self, lat_attr, lng_attr, lat, lng):
